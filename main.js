@@ -6,17 +6,25 @@ const fs = require('fs')
 const emitter = new EventEmitter()
 
 const allData = fs.readFileSync('dataBase.json', 'utf-8')
-const json = JSON.parse(allData)
+let json = JSON.parse(allData)
 
 const command = process.argv[2]
-const argvId = process.argv[3]
-const text = process.argv[4] || null
+let argvId = process.argv[3]
+let text = process.argv[4]
+
+argvId = parseInt(argvId)
 
 if (!process.argv[4]) {
-    text = argvId
+    text = process.argv[3]
 }
 
-const selectedTask = json.find(item => item.id === argvId)
+if (+(process.argv[4]) === 'number') {
+    text = process.argv[3]
+    argvId = process.argv[4]
+}
+
+let selectedTask = json.find(item => item.id === argvId)
+const selectedIndex = json.findIndex(item => item.id === argvId)
 
 
 emitter.on('add', (data) => {
@@ -25,12 +33,19 @@ emitter.on('add', (data) => {
     console.log(`Задание успешно добавлено! (ID = ${data.id})`)
 })
 
-emitter.on('update', (data, argvId) => {
+emitter.on('update', (data) => {
+    selectedTask.description = data.description
+    selectedTask.updatedAt = moment().format('DD.MM.YYYY')
+    json.splice(selectedIndex, 1, selectedTask)
+    fs.writeFileSync('dataBase.json', JSON.stringify(json, null, 2), 'utf-8')
 
+    console.log(`Задание успешно обновлено! (ID = ${data.id})`)
 })
 
-emitter.on('delete', (data, argvId) => {
-    // const selectedTask = json.find(item => item.id === argvId)
+emitter.on('delete', () => {
+    json.splice(selectedIndex, 1)
+    fs.writeFileSync('dataBase.json', JSON.stringify(json, null, 2), 'utf-8')
+    console.log(`Задание успешно удалено! (ID = ${argvId})`)
 })
 
 emitter.on('delete-all', () => {
@@ -60,7 +75,7 @@ emitter.emit(command, {
     "description": text,
     "status": 'todo',
     "createdAt": moment().format('DD.MM.YYYY'),
-    "updatedAr": moment().format('DD.MM.YYYY')
+    "updatedAt": moment().format('DD.MM.YYYY')
 }, argvId)
 
 
