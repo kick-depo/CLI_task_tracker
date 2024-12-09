@@ -106,6 +106,11 @@ emitter.on('mark-todo', () => {
     
 })
 
+emitter.on('help', () => {
+    const help = fs.readFileSync('README.md', 'utf-8')
+    console.log(help)
+})
+
 emitter.emit(command, {
     "id": Date.now() - 1733149700000,
     "description": text,
