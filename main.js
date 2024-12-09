@@ -56,8 +56,27 @@ emitter.on('delete-all', () => {
     }
 })
 
-emitter.on('list', () => {
-    console.log(json)
+emitter.on('list', (data) => {
+    switch (data.description) {
+        case 'done':
+            selectedTask = json.filter(item => item.status === 'done')
+            console.log(selectedTask)
+            break
+
+        case 'in-progress':
+            selectedTask = json.filter(item => item.status === 'in-progress')
+            console.log(selectedTask)
+            break
+
+        case 'todo':
+            selectedTask = json.filter(item => item.status === 'todo')
+            console.log(selectedTask)
+            break
+
+        default:
+            console.log(json)
+            break
+    }
 })
 
 emitter.on('mark-in-progress', () => {
