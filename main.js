@@ -12,16 +12,16 @@ const command = process.argv[2]
 let argvId = process.argv[3]
 let text = process.argv[4]
 
-argvId = parseInt(argvId)
-
 if (!process.argv[4]) {
     text = process.argv[3]
 }
 
-if (+(process.argv[4]) === 'number') {
+if (!isNaN(parseInt(process.argv[4]))) {
     text = process.argv[3]
     argvId = process.argv[4]
 }
+
+argvId = parseInt(argvId)
 
 let selectedTask = json.find(item => item.id === argvId)
 const selectedIndex = json.findIndex(item => item.id === argvId)
@@ -38,7 +38,6 @@ emitter.on('update', (data) => {
     selectedTask.updatedAt = moment().format('DD.MM.YYYY')
     json.splice(selectedIndex, 1, selectedTask)
     fs.writeFileSync('dataBase.json', JSON.stringify(json, null, 2), 'utf-8')
-
     console.log(`Задание успешно обновлено! (ID = ${data.id})`)
 })
 
@@ -61,12 +60,30 @@ emitter.on('list', () => {
     console.log(json)
 })
 
-emitter.on('mark-in-progress', (data) => {
+emitter.on('mark-in-progress', () => {
+    selectedTask.status = "in progress"
+    selectedTask.updatedAt = moment().format('DD.MM.YYYY')
+    json.splice(selectedIndex, 1, selectedTask)
+    fs.writeFileSync('dataBase.json', JSON.stringify(json, null, 2), 'utf-8')
+    console.log(`Статус успешно обновлен: ${selectedTask.status}`)
+
+})
+
+emitter.on('mark-done', () => {
+    selectedTask.status = "done"
+    selectedTask.updatedAt = moment().format('DD.MM.YYYY')
+    json.splice(selectedIndex, 1, selectedTask)
+    fs.writeFileSync('dataBase.json', JSON.stringify(json, null, 2), 'utf-8')
+    console.log(`Статус успешно обновлен: ${selectedTask.status}`)
     
 })
 
-emitter.on('mark-done', (data) => {
-    data.status = 'done'
+emitter.on('mark-todo', () => {
+    selectedTask.status = "todo"
+    selectedTask.updatedAt = moment().format('DD.MM.YYYY')
+    json.splice(selectedIndex, 1, selectedTask)
+    fs.writeFileSync('dataBase.json', JSON.stringify(json, null, 2), 'utf-8')
+    console.log(`Статус успешно обновлен: ${selectedTask.status}`)
     
 })
 
