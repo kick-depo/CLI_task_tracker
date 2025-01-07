@@ -26,6 +26,14 @@ argvId = parseInt(argvId)
 let selectedTask = json.find(item => item.id === argvId)
 const selectedIndex = json.findIndex(item => item.id === argvId)
 
+function setId() {
+    let freeId = 0
+    if (json[0]) {
+        freeId = json[json.length - 1].id + 1
+    }
+    return freeId
+}
+
 
 emitter.on('add', (data) => {
     json.push(data)
@@ -112,7 +120,8 @@ emitter.on('help', () => {
 })
 
 emitter.emit(command, {
-    "id": Date.now() - 1733149700000,
+    // "id": Date.now() - 1733149700000,
+    "id": setId(),
     "description": text,
     "status": 'todo',
     "createdAt": moment().format('DD.MM.YYYY'),
