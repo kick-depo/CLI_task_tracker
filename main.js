@@ -5,6 +5,11 @@ const fs = require('fs')
 
 const emitter = new EventEmitter()
 
+
+if (!fs.existsSync('dataBase.json')) {
+    fs.appendFileSync('dataBase.json', '[]', 'utf-8')
+}
+
 const allData = fs.readFileSync('dataBase.json', 'utf-8')
 let json = JSON.parse(allData)
 
@@ -36,6 +41,9 @@ function setId() {
 
 
 emitter.on('add', (data) => {
+    if (!json) {
+        fs.appendFileSync('dataBase.json', "[]", 'utf-8')
+    }
     json.push(data)
     fs.writeFileSync('dataBase.json', JSON.stringify(json, null, 2), 'utf-8')
     console.log(`Задание успешно добавлено! (ID = ${data.id})`)
@@ -120,7 +128,6 @@ emitter.on('help', () => {
 })
 
 emitter.emit(command, {
-    // "id": Date.now() - 1733149700000,
     "id": setId(),
     "description": text,
     "status": 'todo',
