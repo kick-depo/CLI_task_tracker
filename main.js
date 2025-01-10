@@ -1,6 +1,5 @@
 const process = require('process')
 const EventEmitter = require('events')
-const moment = require('moment')
 const fs = require('fs')
 
 const emitter = new EventEmitter()
@@ -39,28 +38,48 @@ function setId() {
     return freeId
 }
 
+// function currentDate() {
+//     let date = new Date
+//     date.toISOString
+    
+// }
+
 
 emitter.on('add', (data) => {
-    if (!json) {
-        fs.appendFileSync('dataBase.json', "[]", 'utf-8')
+    try {
+        if (!json) {
+            fs.appendFileSync('dataBase.json', "[]", 'utf-8')
+        }
+        json.push(data)
+        fs.writeFileSync('dataBase.json', JSON.stringify(json, null, 2), 'utf-8')
+        console.log(`Задание успешно добавлено! (ID = ${data.id})`)
+    } catch (error) {
+        console.log("Ошибка выполнения команды: ", error)
     }
-    json.push(data)
-    fs.writeFileSync('dataBase.json', JSON.stringify(json, null, 2), 'utf-8')
-    console.log(`Задание успешно добавлено! (ID = ${data.id})`)
+    
 })
 
 emitter.on('update', (data) => {
-    selectedTask.description = data.description
-    selectedTask.updatedAt = moment().format('DD.MM.YYYY')
-    json.splice(selectedIndex, 1, selectedTask)
-    fs.writeFileSync('dataBase.json', JSON.stringify(json, null, 2), 'utf-8')
-    console.log(`Задание успешно обновлено! (ID = ${data.id})`)
+    try {
+        selectedTask.description = data.description
+        selectedTask.updatedAt = data.updatedAt
+        json.splice(selectedIndex, 1, selectedTask)
+        fs.writeFileSync('dataBase.json', JSON.stringify(json, null, 2), 'utf-8')
+        console.log(`Задание успешно обновлено! (ID = ${selectedTask.id})`)
+    } catch (error) {
+        console.log("Ошибка выполнения команды: ", error)
+    }
 })
 
 emitter.on('delete', () => {
-    json.splice(selectedIndex, 1)
-    fs.writeFileSync('dataBase.json', JSON.stringify(json, null, 2), 'utf-8')
-    console.log(`Задание успешно удалено! (ID = ${argvId})`)
+    try {
+        json.splice(selectedIndex, 1)
+        fs.writeFileSync('dataBase.json', JSON.stringify(json, null, 2), 'utf-8')
+        console.log(`Задание успешно удалено! (ID = ${argvId})`)
+    } catch (error) {
+        console.log("Ошибка выполнения команды: ", error)
+    }
+    
 })
 
 emitter.on('delete-all', () => {
@@ -68,58 +87,74 @@ emitter.on('delete-all', () => {
         fs.writeFileSync('dataBase.json', JSON.stringify([], null, 2), 'utf-8')
         console.log('Все записи успешно удалены!')
     } catch {
-        console.log('Ошибка удаления всех файлов :c')
+        console.log("Ошибка выполнения команды: ", error)
     }
 })
 
 emitter.on('list', (data) => {
-    switch (data.description) {
-        case 'done':
-            selectedTask = json.filter(item => item.status === 'done')
-            console.log(selectedTask)
-            break
-
-        case 'in-progress':
-            selectedTask = json.filter(item => item.status === 'in-progress')
-            console.log(selectedTask)
-            break
-
-        case 'todo':
-            selectedTask = json.filter(item => item.status === 'todo')
-            console.log(selectedTask)
-            break
-
-        default:
-            console.log(json)
-            break
+    try {
+        switch (data.description) {
+            case 'done':
+                selectedTask = json.filter(item => item.status === 'done')
+                console.log(selectedTask)
+                break
+    
+            case 'in-progress':
+                selectedTask = json.filter(item => item.status === 'in-progress')
+                console.log(selectedTask)
+                break
+    
+            case 'todo':
+                selectedTask = json.filter(item => item.status === 'todo')
+                console.log(selectedTask)
+                break
+    
+            default:
+                console.log(json)
+                break
+        }
+    } catch (error) {
+        console.log("Ошибка выполнения команды: ", error)
     }
+    
 })
 
 emitter.on('mark-in-progress', () => {
-    selectedTask.status = "in progress"
-    selectedTask.updatedAt = moment().format('DD.MM.YYYY')
-    json.splice(selectedIndex, 1, selectedTask)
-    fs.writeFileSync('dataBase.json', JSON.stringify(json, null, 2), 'utf-8')
-    console.log(`Статус успешно обновлен: ${selectedTask.status}`)
+    try {
+        selectedTask.status = "in progress"
+        selectedTask.updatedAt = moment().format('DD.MM.YYYY')
+        json.splice(selectedIndex, 1, selectedTask)
+        fs.writeFileSync('dataBase.json', JSON.stringify(json, null, 2), 'utf-8')
+        console.log(`Статус успешно обновлен: ${selectedTask.status}`)
+    } catch (error) {
+        console.log("Ошибка выполнения команды: ", error)
+    }
+    
 
 })
 
 emitter.on('mark-done', () => {
-    selectedTask.status = "done"
-    selectedTask.updatedAt = moment().format('DD.MM.YYYY')
-    json.splice(selectedIndex, 1, selectedTask)
-    fs.writeFileSync('dataBase.json', JSON.stringify(json, null, 2), 'utf-8')
-    console.log(`Статус успешно обновлен: ${selectedTask.status}`)
-    
+    try {
+        selectedTask.status = "done"
+        selectedTask.updatedAt = moment().format('DD.MM.YYYY')
+        json.splice(selectedIndex, 1, selectedTask)
+        fs.writeFileSync('dataBase.json', JSON.stringify(json, null, 2), 'utf-8')
+        console.log(`Статус успешно обновлен: ${selectedTask.status}`)
+    } catch (error) {
+        console.log("Ошибка выполнения команды: ", error)
+    }
 })
 
 emitter.on('mark-todo', () => {
-    selectedTask.status = "todo"
-    selectedTask.updatedAt = moment().format('DD.MM.YYYY')
-    json.splice(selectedIndex, 1, selectedTask)
-    fs.writeFileSync('dataBase.json', JSON.stringify(json, null, 2), 'utf-8')
-    console.log(`Статус успешно обновлен: ${selectedTask.status}`)
-    
+    try {
+        selectedTask.status = "todo"
+        selectedTask.updatedAt = moment().format('DD.MM.YYYY')
+        json.splice(selectedIndex, 1, selectedTask)
+        fs.writeFileSync('dataBase.json', JSON.stringify(json, null, 2), 'utf-8')
+        console.log(`Статус успешно обновлен: ${selectedTask.status}`)
+    } catch (error) {
+        console.log("Ошибка выполнения команды: ", error)
+    }
 })
 
 emitter.on('help', () => {
@@ -131,8 +166,8 @@ emitter.emit(command, {
     "id": setId(),
     "description": text,
     "status": 'todo',
-    "createdAt": moment().format('DD.MM.YYYY'),
-    "updatedAt": moment().format('DD.MM.YYYY')
+    "createdAt": new Date,
+    "updatedAt": new Date
 }, argvId)
 
 
