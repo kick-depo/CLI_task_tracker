@@ -38,11 +38,10 @@ function setId() {
     return freeId
 }
 
-// function currentDate() {
-//     let date = new Date
-//     date.toISOString
-    
-// }
+function currentDate() {
+    const date = new Date().toISOString().replace('T', ' ').slice(0, 19)
+    return date
+}
 
 
 emitter.on('add', (data) => {
@@ -119,10 +118,10 @@ emitter.on('list', (data) => {
     
 })
 
-emitter.on('mark-in-progress', () => {
+emitter.on('mark-in-progress', (data) => {
     try {
         selectedTask.status = "in progress"
-        selectedTask.updatedAt = moment().format('DD.MM.YYYY')
+        selectedTask.updatedAt = data.updatedAt
         json.splice(selectedIndex, 1, selectedTask)
         fs.writeFileSync('dataBase.json', JSON.stringify(json, null, 2), 'utf-8')
         console.log(`Статус успешно обновлен: ${selectedTask.status}`)
@@ -133,10 +132,10 @@ emitter.on('mark-in-progress', () => {
 
 })
 
-emitter.on('mark-done', () => {
+emitter.on('mark-done', (data) => {
     try {
         selectedTask.status = "done"
-        selectedTask.updatedAt = moment().format('DD.MM.YYYY')
+        selectedTask.updatedAt = data.updatedAt
         json.splice(selectedIndex, 1, selectedTask)
         fs.writeFileSync('dataBase.json', JSON.stringify(json, null, 2), 'utf-8')
         console.log(`Статус успешно обновлен: ${selectedTask.status}`)
@@ -145,10 +144,10 @@ emitter.on('mark-done', () => {
     }
 })
 
-emitter.on('mark-todo', () => {
+emitter.on('mark-todo', (data) => {
     try {
         selectedTask.status = "todo"
-        selectedTask.updatedAt = moment().format('DD.MM.YYYY')
+        selectedTask.updatedAt = data.updatedAt
         json.splice(selectedIndex, 1, selectedTask)
         fs.writeFileSync('dataBase.json', JSON.stringify(json, null, 2), 'utf-8')
         console.log(`Статус успешно обновлен: ${selectedTask.status}`)
@@ -166,8 +165,6 @@ emitter.emit(command, {
     "id": setId(),
     "description": text,
     "status": 'todo',
-    "createdAt": new Date,
-    "updatedAt": new Date
+    "createdAt": currentDate(),
+    "updatedAt": currentDate()
 }, argvId)
-
-
